@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.8.3-alpine
+    restart: always
+
+  mysql:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - db_data:/var/lib/mysql
+    ports: 
+      - '3309:3306'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  
+  nginx:
+    image: nginx
+    depends_on:
+      - ticket
+      - payment
+      - user
+    restart: always
+    ports: 
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
+  ticket:
+    depends_on:
+      - mysql
+      - rabbitmq
+    build: ./ticket_microservice
+    image: ticket:1.15
+    restart: always
+
+  payment:
+    depends_on:
+      - mysql
+      - rabbitmq
+    build: ./payment_microservice
+    image: payment:1.1
+    restart: always
+
+  user:
+    depends_on:
+      - mysql
+      - rabbitmq
+    build: ./user_microservice
+    image: user:1.13
+    restart: always
+volumes:
+    db_data: {}
