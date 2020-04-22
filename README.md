@@ -10,7 +10,7 @@ The aim of this project is to get started with microservices and more specifical
 
 # Install and startup
 
-````
+```
 git clone git@github.com:tbornon/service_engineering.git
 cd service_enginerring
 docker-compose up
